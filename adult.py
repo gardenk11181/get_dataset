@@ -6,7 +6,7 @@ import pickle
 from sklearn.model_selection import train_test_split
 
 
-class AdultPrepare():
+class AdultPrepare:
     def __init__(self, target_dir, download_dir, n_splits=5, val_split=0.3):
         """
         target_dir: where we want to save pre-processed data into pkl
@@ -61,7 +61,7 @@ class AdultPrepare():
         age[age >= 65] = 1
 
         one_hot_categorical = pd.get_dummies(categorical)
-        one_hot_num = pd.concat([pd.cut(numeric[name], 2).astype('category').cat.codes for name in numeric], axis=1)
+        one_hot_num = pd.concat([pd.qcut(numeric[name], 2, duplicates='drop').astype('category').cat.codes for name in numeric], axis=1)
         one_hot_num.columns = numeric.columns
         one_hot = pd.concat([one_hot_categorical, sex, one_hot_num, age, y], axis=1)
         one_hot[0:len(train)].to_pickle(os.path.join(self.target_dir, 'adult_train.pkl'))
