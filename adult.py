@@ -48,8 +48,8 @@ class AdultPrepare:
         y[y == '>50K'] = 1
 
         sex = x.pop('sex')
-        sex[sex == 'Female'] = 0
-        sex[sex == 'Male'] = 1
+        sex[sex == ' Female'] = 0
+        sex[sex == ' Male'] = 1
 
         categorical_cols = ['workclass', 'education', 'marital-status', 'occupation', 'relationship', 'race',
                             'native-country']
@@ -57,13 +57,19 @@ class AdultPrepare:
         numeric = x.drop(columns=categorical_cols)
 
         age = numeric.pop('age')
-        age[age < 65] = 0
-        age[age >= 65] = 1
+        age[age <= 39] = 0
+        age[age > 39] = 1
 
         one_hot_categorical = pd.get_dummies(categorical)
-        one_hot_num = pd.concat([pd.qcut(numeric[name], 2, duplicates='drop').astype('category').cat.codes for name in numeric], axis=1)
-        one_hot_num.columns = numeric.columns
-        one_hot = pd.concat([one_hot_categorical, sex, one_hot_num, age, y], axis=1)
+
+        cut_points = [2e5, 9, 0, 0, 40, 39]
+        one_hot_numeric = pd.concat(
+            [pd.cut(numeric[name], [-np.inf, cut, np.inf]).astype('category').cat.codes for name, cut in
+             zip(numeric, cut_points)], axis=1)
+        one_hot_numeric.columns = numeric.columns
+
+        one_hot = pd.concat([one_hot_categorical, sex, one_hot_numeric, age, y], axis=1)
+        # one_hot.to_pickle(os.path.join(self.target_dir, 'adult.pkl'))
         one_hot[0:len(train)].to_pickle(os.path.join(self.target_dir, 'adult_train.pkl'))
         one_hot[len(train):].to_pickle(os.path.join(self.target_dir, 'adult_test.pkl'))
 
