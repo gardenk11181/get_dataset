@@ -80,12 +80,6 @@ def experiment(type):
 
 if __name__ == '__main__':
     warnings.filterwarnings(action='ignore')
-    # german = GermanPrepare('./german/', './german_source/')
-    # german.download()
-    # german.prepare()
-    # adult = AdultPrepare('./adult/', './adult_source')
-    # adult.download()
-    # adult.prepare()
     dict = {0: 'german', 1: 'adult', 2: 'health'}
     for i in range(3):
         print('---------------------------------------------------------------------------')
