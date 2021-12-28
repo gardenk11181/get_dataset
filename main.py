@@ -5,8 +5,6 @@ from adult import AdultPrepare
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from torch.utils.data import DataLoader
-from dataset import Adult, German
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.dummy import DummyClassifier
@@ -15,8 +13,6 @@ import warnings
 
 def experiment(type):
     """
-
-
     :param type: 0 -> german, 1 -> adult, 2 -> health
     :return: scores of logistic, random forest, random choice & accuracy on y
     """
@@ -35,7 +31,12 @@ def experiment(type):
         with open(os.path.join(target_dir, 'adult_test.pkl'), 'rb') as f:
             test = pickle.load(f)
     else:
+        target_dir = './health/'
         sensitive = 'age'
+        with open(os.path.join(target_dir, 'health_train.pkl'), 'rb') as f:
+            train = pickle.load(f)
+        with open(os.path.join(target_dir, 'health_test.pkl'), 'rb') as f:
+            test = pickle.load(f)
 
     train_s = train.pop(sensitive).astype('category')
     train_y = train.pop('label').astype('category')
@@ -79,8 +80,14 @@ def experiment(type):
 
 if __name__ == '__main__':
     warnings.filterwarnings(action='ignore')
-    dict = {0: 'german', 1: 'adult'}
-    for i in range(2):
+    # german = GermanPrepare('./german/', './german_source/')
+    # german.download()
+    # german.prepare()
+    # adult = AdultPrepare('./adult/', './adult_source')
+    # adult.download()
+    # adult.prepare()
+    dict = {0: 'german', 1: 'adult', 2: 'health'}
+    for i in range(3):
         print('---------------------------------------------------------------------------')
         print(dict[i])
         print('---------------------------------------------------------------------------')
