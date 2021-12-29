@@ -1,5 +1,5 @@
 import os
-import pickle
+import pickle5 as pickle
 from german import GermanPrepare
 from adult import AdultPrepare
 import matplotlib.pyplot as plt
@@ -79,6 +79,7 @@ def experiment(type):
 
 
 if __name__ == '__main__':
+
     warnings.filterwarnings(action='ignore')
     dict = {0: 'german', 1: 'adult', 2: 'health'}
     for i in range(3):
@@ -88,5 +89,5 @@ if __name__ == '__main__':
         log_score, rf_score, random_score, disc, disc_prob, log_y_score = experiment(i)
         print('logistic: %f, random forest: %f, random choice: %f' %
               (log_score, rf_score, random_score))
-        print('discrimination on s: %f, dsicrimination prob on s: %f' % (disc, disc_prob))
+        print('discrimination on s: %f, discrimination prob on s: %f' % (disc, disc_prob))
         print('accuracy on y: %f' % log_y_score)
