@@ -65,9 +65,10 @@ class GermanPrepare:
         one_hot_categorical = pd.get_dummies(categorical)
         purpose_a47 = pd.DataFrame(0, index=np.arange(1000), columns=['purpose_A47'])
 
-        cut_points = [23, 2499, 2, 2, 34, 1, 1]
-        one_hot_numeric = pd.concat([pd.cut(numeric[name], [-np.inf, cut, np.inf]).astype('category').cat.codes for name,cut in zip(numeric,cut_points)], axis=1)
+        one_hot_numeric = pd.concat([pd.cut(numeric[name], 5) for name in numeric], axis=1)
         one_hot_numeric.columns = numeric.columns
+        one_hot_numeric = pd.concat([pd.get_dummies(one_hot_numeric[name], prefix=one_hot_numeric[name].name)
+                                     for name in one_hot_numeric], axis=1)
 
         one_hot = pd.concat([one_hot_categorical.iloc[:, :11], one_hot_categorical.iloc[:, 12:17],
                              purpose_a47, one_hot_categorical.iloc[:, 17:19],
