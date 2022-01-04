@@ -23,7 +23,7 @@ class Adult(Dataset):
         s = torch.as_tensor(data.pop('age'), dtype=torch.float32).reshape(-1)
         x = torch.as_tensor(data, dtype=torch.float32)
 
-        # x: [batch_size, 102], s&y: [batch_size, 1]
+        # x: [batch_size, 121], s&y: [batch_size, 1]
         return [x, s, y]
 
 
@@ -45,7 +45,7 @@ class German(Dataset):
         s = torch.as_tensor(data.pop('sex'), dtype=torch.float32).reshape(-1)
         x = torch.as_tensor(data, dtype=torch.float32)
 
-        # x: [batch_size, 56], s&y: [batch_size, 1]
+        # x: [batch_size, 84], s&y: [batch_size, 1]
         return [x, s, y]
 
 
@@ -67,5 +67,5 @@ class Health(Dataset):
         s = torch.as_tensor(data.pop('age'), dtype=torch.float32).reshape(-1)
         x = torch.as_tensor(data, dtype=torch.float32)
 
-        # x: [batch_size, 130], s&y: [batch_size, 1]
+        # x: [batch_size, 621], s&y: [batch_size, 1]
         return [x, s, y]
