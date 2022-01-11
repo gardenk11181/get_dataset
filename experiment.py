@@ -37,8 +37,8 @@ def preprocess(tp, dir_path):
         with open(os.path.join(target_dir, 'health_test.pkl'), 'rb') as f:
             test = pickle.load(f)
 
-    # train_z1_vae = np.load(os.path.join(dir_path, '/exp_%s/', "%s_train_z1_vae.npy" % data))
-    # test_z1_vae = np.load(os.path.join(dir_path, '/exp_%s/', "%s_test_z1_vae.npy" % data))
+    train_z1_vae = np.load(os.path.join(dir_path + '/exp_%s/' % data, "%s_train_z1_vae.npy" % data))
+    test_z1_vae = np.load(os.path.join(dir_path + '/exp_%s/' % data, "%s_test_z1_vae.npy" % data))
     train_z1_vfae = np.load(os.path.join(dir_path + '/exp_%s/' % data, "%s_train_z1_vfae.npy" % data))
     test_z1_vfae = np.load(os.path.join(dir_path + '/exp_%s/' % data, "%s_test_z1_vfae.npy" % data))
 
@@ -50,8 +50,8 @@ def preprocess(tp, dir_path):
     test_y = test.pop('label').astype('category')
     test_x = test.astype('category')
 
-    train_z1 = [train_x, train_z1_vfae]
-    test_z1 = [test_x, test_z1_vfae]
+    train_z1 = [train_x, train_z1_vae, train_z1_vfae]
+    test_z1 = [test_x, test_z1_vae, test_z1_vfae]
 
     return [train_z1, test_z1], [train_s, test_s], [train_y, test_y]
 
@@ -66,7 +66,7 @@ def calculate(z, s, y):
     log_y_scores = []
     disc_scores = []
     disc_prob_scores = []
-    for i in range(2):
+    for i in range(3):
         # logistic regression & random forest
         log = LogisticRegression(random_state=1).fit(train_z1[i], train_s)
         log_scores.append(log.score(test_z1[i], test_s))
