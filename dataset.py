@@ -1,6 +1,7 @@
 import torch
 import os
 import pickle5 as pickle
+import numpy as np
 
 from torch.utils.data import Dataset
 
@@ -99,3 +100,28 @@ class Amazon(Dataset):
             x = torch.as_tensor(data, dtype=torch.float32)
             # x: [batch_size, 5000], y: [batch_size, 1]
             return [x, y]
+
+
+class mYaleB(Dataset):
+    def __init__(self, dir_path, train=True, label=True):
+        if train:
+            self.path = os.path.join(dir_path, 'eyaleb_train.pkl')
+        else:
+            self.path = os.path.join(dir_path, 'eyaleb_test.pkl')
+        with open(self.path, 'rb') as f:
+            self.data = pickle.load(f)
+
+        self.code = torch.from_numpy(np.eye(38)).type(torch.float32)
+        self.code2 = torch.from_numpy(np.eye(5)).type(torch.float32)
+
+    def __len__(self):
+        return (self.data['data'].shape)[0]
+
+    def __getitem__(self, idx):
+        y = self.code[self.data['label'][idx].astype(np.int)]
+        s = self.code2[self.data['light'][idx].astype(np.int)]
+        x = torch.from_numpy((2. * (self.data['data'][idx] / 255) - 1.).reshape((1, 168, 192))).type(torch.float32)
+        target = torch.from_numpy(self.data['label'][idx].reshape(-1)).type(torch.float32)
+
+        # x: [batch_size, 168*192], s: [batch_size, 5], y: [batch_size, 38], target: [batch_size, 1]
+        return [x, s, y, target]
