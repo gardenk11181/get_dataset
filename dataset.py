@@ -2,6 +2,7 @@ import torch
 import os
 import pickle5 as pickle
 import numpy as np
+import pandas as pd
 
 from torch.utils.data import Dataset
 
@@ -83,23 +84,39 @@ class Amazon(Dataset):
         self.path = os.path.join(dir_path, '%s_to_%s.pkl' % (source, target))
         self.tp = tp
         with open(self.path, 'rb') as r:
-            self.data = pickle.load(r)[self.tp]
+            if self.tp == 1:
+                self.x = pd.DataFrame(pickle.load(r)[self.tp].todense())
+            else:
+                tmp = pickle.load(r)[self.tp]
+                self.x = pd.DataFrame(tmp[0].todense())
+                self.y = tmp[1]
+
+        # encode s
+        self.domain_dict = {'books': 0, 'dvd': 1, 'electronics': 2, 'kitchen': 3}
+        self.code = np.zeros((4, 4))
+        for i in range(4):
+            self.code[i, i] = 1.0
+        self.code = torch.as_tensor(self.code, dtype=torch.float32)
+        if self.tp == 0:
+            self.s = self.code[self.domain_dict[source]]
+        else:
+            self.s = self.code[self.domain_dict[target]]
 
     def __len__(self):
-        return len(self.data)
+        return len(self.x)
 
     def __getitem__(self, index):
-        data = self.data.iloc[index]
+        x = self.x.iloc[index]
         if self.tp == 1:
-            x = torch.as_tensor(data, dtype=torch.float32)
-            # x: [batch_size, 5000]
-            return [x]
+            x = torch.as_tensor(x, dtype=torch.float32)
+            # x: [batch_size, 5000], s: [batch_size, 4]
+            return [x, self.s]
 
         else:
-            y = torch.as_tensor(data.pop('y'), dtype=torch.float32).reshape(-1)
-            x = torch.as_tensor(data, dtype=torch.float32)
-            # x: [batch_size, 5000], y: [batch_size, 1]
-            return [x, y]
+            y = torch.as_tensor(self.y.iloc[index], dtype=torch.float32).reshape(-1)
+            x = torch.as_tensor(x, dtype=torch.float32)
+            # x: [batch_size, 5000], s: [batch_size, 4], y: [batch_size, 1]
+            return [x, self.s, y]
 
 
 class mYaleB(Dataset):
