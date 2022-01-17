@@ -92,15 +92,10 @@ class Amazon(Dataset):
                 self.y = tmp[1]
 
         # encode s
-        self.domain_dict = {'books': 0, 'dvd': 1, 'electronics': 2, 'kitchen': 3}
-        self.code = np.zeros((4, 4))
-        for i in range(4):
-            self.code[i, i] = 1.0
-        self.code = torch.as_tensor(self.code, dtype=torch.float32)
         if self.tp == 0:
-            self.s = self.code[self.domain_dict[source]]
+            self.s = torch.as_tensor(0, dtype=torch.float32).reshape(-1)
         else:
-            self.s = self.code[self.domain_dict[target]]
+            self.s = torch.as_tensor(1, dtype=torch.float32).reshape(-1)
 
     def __len__(self):
         return len(self.x)
