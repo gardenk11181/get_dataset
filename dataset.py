@@ -85,9 +85,11 @@ class Amazon(Dataset):
         self.tp = tp
         with open(self.path, 'rb') as r:
             tmp = pickle.load(r)[self.tp]
-            self.x = pd.DataFrame(tmp[0].todense())
             if self.tp != 1:
+                self.x = pd.DataFrame(tmp[0].todense())
                 self.y = tmp[1]
+            else:
+                self.x = pd.DataFrame(tmp.todense())
             if self.tp == 0:
                 self.s = torch.as_tensor(0, dtype=torch.float32).reshape(-1)
             else:
