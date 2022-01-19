@@ -84,18 +84,14 @@ class Amazon(Dataset):
         self.path = os.path.join(dir_path, '%s_to_%s.pkl' % (source, target))
         self.tp = tp
         with open(self.path, 'rb') as r:
-            if self.tp == 1:
-                self.x = pd.DataFrame(pickle.load(r)[self.tp].todense())
-            else:
-                tmp = pickle.load(r)[self.tp]
-                self.x = pd.DataFrame(tmp[0].todense())
+            tmp = pickle.load(r)[self.tp]
+            self.x = pd.DataFrame(tmp[0].todense())
+            if self.tp != 1:
                 self.y = tmp[1]
-
-        # encode s
-        if self.tp == 0:
-            self.s = torch.as_tensor(0, dtype=torch.float32).reshape(-1)
-        else:
-            self.s = torch.as_tensor(1, dtype=torch.float32).reshape(-1)
+            if self.tp == 0:
+                self.s = torch.as_tensor(0, dtype=torch.float32)
+            else:
+                self.s = torch.as_tensor(1, dtype=torch.float32)
 
     def __len__(self):
         return len(self.x)
@@ -104,13 +100,13 @@ class Amazon(Dataset):
         x = self.x.iloc[index]
         if self.tp == 1:
             x = torch.as_tensor(x, dtype=torch.float32)
-            # x: [batch_size, 5000], s: [batch_size, 4]
+            # x: [batch_size, 5000], s: [batch_size, 1]
             return [x, self.s]
 
         else:
-            y = torch.as_tensor(self.y.iloc[index], dtype=torch.float32).reshape(-1)
+            y = torch.as_tensor(self.y.iloc[index], dtype=torch.float32)
             x = torch.as_tensor(x, dtype=torch.float32)
-            # x: [batch_size, 5000], s: [batch_size, 4], y: [batch_size, 1]
+            # x: [batch_size, 5000], s: [batch_size, 1], y: [batch_size, 2]
             return [x, self.s, y]
 
 
