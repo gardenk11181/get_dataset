@@ -89,9 +89,9 @@ class Amazon(Dataset):
             if self.tp != 1:
                 self.y = tmp[1]
             if self.tp == 0:
-                self.s = torch.as_tensor(0, dtype=torch.float32)
+                self.s = torch.as_tensor(0, dtype=torch.float32).reshape(-1)
             else:
-                self.s = torch.as_tensor(1, dtype=torch.float32)
+                self.s = torch.as_tensor(1, dtype=torch.float32).reshape(-1)
 
     def __len__(self):
         return len(self.x)
