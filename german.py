@@ -3,8 +3,7 @@ import os
 from urllib import parse, request
 import pandas as pd
 import pickle
-from sklearn.model_selection import train_test_split
-
+from sklearn.model_selection import train_test_split, KFold
 
 class GermanPrepare:
     def __init__(self, target_dir, download_dir, n_splits=5, val_split=0.3):
@@ -74,14 +73,28 @@ class GermanPrepare:
                              purpose_a47, one_hot_categorical.iloc[:, 17:19],
                              one_hot_categorical.iloc[:, 11], one_hot_categorical.iloc[:, 19:],
                              tele, foreign, one_hot_numeric, sex, y], axis=1)
-        train, test = train_test_split(one_hot, test_size=300)
-        train.index = range(700)
-        test.index = range(300)
-        train.to_pickle(os.path.join(self.target_dir, 'german_train.pkl'))
-        test.to_pickle(os.path.join(self.target_dir, 'german_test.pkl'))
+        
+        kf = KFold(n_splits=self.n_splits)
+        for i, (train, test) in enumerate(kf.split(one_hot)):
+            train = one_hot.iloc[train]
+            test = one_hot.iloc[test]
+            train.index = range(800)
+            test.index = range(200)
+            train.to_pickle(os.path.join(self.target_dir, "german_train_%d.pkl" % (i+1)))
+            test.to_pickle(os.path.join(self.target_dir, "german_test_%d.pkl" % (i+1)))
+#         train, test = train_test_split(one_hot, test_size=300)
+#         train.index = range(700)
+#         test.index = range(300)
+#         train.to_pickle(os.path.join(self.target_dir, 'german_train.pkl'))
+#         test.to_pickle(os.path.join(self.target_dir, 'german_test.pkl'))
 
     @staticmethod
     def _clean(dataset):
         dataset.replace(' ?', np.nan, inplace=True)
         dataset.dropna(inplace=True)
         dataset.index = range(len(dataset))
+        
+if __name__ == '__main__':
+    german = GermanPrepare('/Volumes/GoogleDrive/내 드라이브/data/german', '/Volumes/GoogleDrive/내 드라이브/data/german/source')
+#     german.download()
+    german.prepare()
